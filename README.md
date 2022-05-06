@@ -4,21 +4,22 @@ PHP обертка для [формата данных](https://github.com/RoboT
 
 ## Содержимое
 
-| Метод                                     | Описание                                        |
-|-------------------------------------------|-------------------------------------------------|
-| [Api::__construct](#Api__construct)       | Создает экземпляр Api                           |
-| [Api::getMicrotime](#ApigetMicrotime)     | Возвращает текущий timestamp в микросекундах    |
-| [Api::createOrder](#ApicreateOrder)       | Создание ордера                                 |
-| [Api::generateOrder](#ApigenerateOrder)   | Генерирует ордер для createOrders()             |
-| [Api::createOrders](#ApicreateOrders)     | Создание нескольких ордеров.                    |
-| [Api::cancelOrder](#ApicancelOrder)       | Отмена ордера                                   |
-| [Api::cancelOrders](#ApicancelOrders)     | Отмена нескольких ордеров                       |
-| [Api::getOrderStatus](#ApigetOrderStatus) | Получить статус ордера                          |
-| [Api::getBalances](#ApigetBalances)       | Информация о балансах активов.                  |
-| [Api::orderInfo](#ApiorderInfo)           | Информация о создании, закрытие, статусе ордера |
-| [Api::balances](#Apibalances)             | Информация о балансах (от гейта к ядру).        |
-| [Api::orderbook](#Apiorderbook)           | Ордербук отправляемый гейтом ядру.              |
-| [Api::error](#Apierror)                   | Сообщение об ошибке                             |
+| Метод                                       | Описание                                       |
+|---------------------------------------------|------------------------------------------------|
+| [Api::__construct](#Api__construct)         | Создает экземпляр Api                          |
+| [Api::getMicrotime](#ApigetMicrotime)       | Возвращает текущий timestamp в микросекундах   |
+| [Api::createOrder](#ApicreateOrder)         | Создание ордера                                |
+| [Api::generateOrder](#ApigenerateOrder)     | Генерирует ордер для createOrders()            |
+| [Api::createOrders](#ApicreateOrders)       | Создание нескольких ордеров                    |
+| [Api::cancelOrder](#ApicancelOrder)         | Отмена ордера                                  |
+| [Api::cancelOrders](#ApicancelOrders)       | Отмена нескольких ордеров                      |
+| [Api::cancelAllOrders](#ApicancelAllOrders) | Отмена всех открытых ордеров                   |
+| [Api::getOrderStatus](#ApigetOrderStatus)   | Получить статус ордера                         |
+| [Api::getBalances](#ApigetBalances)         | Информация о балансах активов.                 |
+| [Api::orderInfo](#ApiorderInfo)             | Информация о создании, закрытие, статусе ордера |
+| [Api::balances](#Apibalances)               | Информация о балансах (от гейта к ядру).       |
+| [Api::orderbook](#Apiorderbook)             | Ордербук отправляемый гейтом ядру.             |
+| [Api::error](#Apierror)                     | Сообщение об ошибке                            |
 
 ## Api
 
@@ -238,8 +239,30 @@ $cancel_orders = $api->cancelOrders([$order_one, $order_two, $order_three]);
 
 **Возвращает:**: json
 
+---
+### Api::cancelAllOrders
+Отмена всех открытых ордеров
+
+```php
+Api::cancelAllOrders( string|null message = null ): string
+```
 
 
+
+
+**Параметры:**
+
+| Параметр | Тип | Описание |
+|-----------|------|-------------|
+| `message` | **string&#124;null** | Сообщение (необязательно) |
+
+
+**Пример**:
+```php
+$cancel_all_orders = $api->cancelAllOrders();
+```
+
+**Возвращает:**: json
 
 
 ---

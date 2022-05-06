@@ -163,6 +163,22 @@ class Api
     }
 
     /**
+     * Отмена всех открытых ордеров
+     *
+     * @param string|null $message Сообщение (необязательно)
+     * @return string
+     */
+    public function cancelAllOrders(string $message = null): string
+    {
+        $event = "command";
+        $action = "cancel_all_orders";
+
+        $data = '""';
+
+        return $this->messageGenerator($event, $action, $data, $message);
+    }
+
+    /**
      * Получить статус ордера
      *
      * @param string $id ID ордера
