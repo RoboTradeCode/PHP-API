@@ -36,7 +36,8 @@ class Api
      */
     private function messageGenerator(string $event, string $action, string $data, string $message = null): string
     {
-        return '{"event":"' . $event . '",' .
+        return '{"event_id":"' . $this->generateUUID() . '",' .
+            '"event":"' . $event . '",' .
             '"exchange":"' . $this->exchange . '",' .
             '"node":"' . $this->node . '",' .
             '"instance": "' . $this->instance . '",' .
