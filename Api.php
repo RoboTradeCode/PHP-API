@@ -58,6 +58,16 @@ class Api
     }
 
     /**
+     * Возвращает уникальный ID на основе timestamp
+     *
+     * @return string
+     */
+    public function getUniqID(): string
+    {
+        return uniqid(rand(100, 999) . '-',true);
+    }
+
+    /**
      * Создание ордера
      *
      * @param string $symbol Торговая пара
