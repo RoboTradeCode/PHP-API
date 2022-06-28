@@ -287,12 +287,12 @@ class Api
      * Сообщения об ошибке
      *
      * @param string $action Действие при котором возникла ошибка
-     * @param mixed $data Данные об ошибке
+     * @param null|string $data Данные об ошибке
      * @param string|null $message Сообщение об ошибке
      * @return string
      * @throws \Exception
      */
-    public function error(string $action, $data = "", string $message = null): string
+    public function error(string $action, null|string $data = "", string $message = null): string
     {
         $event = "error";
 
