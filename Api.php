@@ -33,6 +33,7 @@ class Api
      * @param string $data
      * @param string|null $message
      * @return string
+     * @throws \Exception
      */
     private function messageGenerator(string $event, string $action, string $data, string $message = null): string
     {
@@ -62,6 +63,7 @@ class Api
      * Возвращает уникальный UUID4
      *
      * @return string
+     * @throws \Exception
      */
     public function generateUUID(): string
     {
@@ -81,6 +83,7 @@ class Api
     /**
      * Создание ордера
      *
+     * @param string $client_order_id Уникальный ID для ордера
      * @param string $symbol Торговая пара
      * @param string $type Тип (limit или market)
      * @param string $side Направление сделки
@@ -88,17 +91,19 @@ class Api
      * @param float $price Цена
      * @param string|null $message Сообщение (необязательно)
      * @return string
+     * @throws \Exception
      */
-    public function createOrder(string $symbol, string $type, string $side, float $amount, float $price, string $message = null): string
+    public function createOrder(string $client_order_id, string $symbol, string $type, string $side, float $amount, float $price, string $message = null): string
     {
         $event = "command";
-        $action = "create_order";
+        $action = "create_orders";
 
         $data = '[{"symbol":"' . $symbol . '",' .
             '"type":"' . $type . '",' .
             '"side":"' . $side . '",' .
             '"amount":' . $amount . ',' .
-            '"price":' . $price . '}]';
+            '"price":' . $price . ',' .
+            '"client_order_id":"' . $client_order_id . '"}]';
 
         return $this->messageGenerator($event, $action, $data, $message);
     }
@@ -106,6 +111,7 @@ class Api
     /**
      * Генерирует ордер для createOrders()
      *
+     * @param string $client_order_id Уникальный ID для ордера
      * @param string $symbol Торговая пара
      * @param string $type Тип (limit или market)
      * @param string $side Направление сделки
@@ -113,13 +119,14 @@ class Api
      * @param float $price Цена
      * @return string
      */
-    public function generateOrder(string $symbol, string $type, string $side, float $amount, float $price): string
+    public function generateOrder(string $client_order_id, string $symbol, string $type, string $side, float $amount, float $price): string
     {
         return '{"symbol":"' . $symbol . '",' .
             '"type":"' . $type . '",' .
             '"side":"' . $side . '",' .
             '"amount":' . $amount . ',' .
-            '"price":' . $price . '},';
+            '"price":' . $price . ',' .
+            '"client_order_id":"' . $client_order_id . '"},';
     }
 
     /**
@@ -129,11 +136,12 @@ class Api
      * @param array $orders Массив ордеров
      * @param string|null $message Сообщение (необязательно)
      * @return string
+     * @throws \Exception
      */
     public function createOrders(array $orders, string $message = null): string
     {
         $event = "command";
-        $action = "create_order";
+        $action = "create_orders";
 
         $data = '[' . rtrim(implode('', $orders), ',') . ']';
 
@@ -143,39 +151,41 @@ class Api
     /**
      * Отмена ордера
      *
-     * @param string $id ID ордера
+     * @param string $client_order_id ID ордера, сгенерированный при создании
      * @param string $symbol Торговая пара
      * @param string|null $message Сообщение (необязательно)
      * @return string
+     * @throws \Exception
      */
-    public function cancelOrder(string $id, string $symbol, string $message = null): string
+    public function cancelOrder(string $client_order_id, string $symbol, string $message = null): string
     {
         $event = "command";
-        $action = "cancel_order";
+        $action = "cancel_orders";
 
-        $data = '[{"id":"' . $id . '","symbol":"' . $symbol . '"}]';
+        $data = '[{"client_order_id":"' . $client_order_id . '","symbol":"' . $symbol . '"}]';
 
         return $this->messageGenerator($event, $action, $data, $message);
     }
 
     /**
      * Отмена нескольких ордеров
-     * Структура массива ордеров: [["id1", "symbol1"], ["id2", "symbol2"], ...]
+     * Структура массива ордеров: [["client_order_id1", "symbol1"], ["client_order_id2", "symbol2"], ...]
      *
      * @param array $orders Массив ордеров
      * @param string|null $message Сообщение (необязательно)
      * @return string
+     * @throws \Exception
      */
     public function cancelOrders(array $orders, string $message = null): string
     {
 
         $event = "command";
-        $action = "cancel_order";
+        $action = "cancel_orders";
 
         $data = '[';
 
         foreach ($orders as $order) {
-            $data .= '{"id":"' . $order['id'] . '","symbol":"' . $order['symbol'] . '"},';
+            $data .= '{"client_order_id":"' . $order['client_order_id'] . '","symbol":"' . $order['symbol'] . '"},';
         }
 
         $data = rtrim($data, ',') . ']';
@@ -188,6 +198,7 @@ class Api
      *
      * @param string|null $message Сообщение (необязательно)
      * @return string
+     * @throws \Exception
      */
     public function cancelAllOrders(string $message = null): string
     {
@@ -202,17 +213,43 @@ class Api
     /**
      * Получить статус ордера
      *
-     * @param string $id ID ордера
+     * @param string $client_order_id ID ордера, сгенерированный при создании
      * @param string $symbol Торговая пара
      * @param string|null $message Сообщение (необязательно)
      * @return string
+     * @throws \Exception
      */
-    public function getOrderStatus(string $id, string $symbol, string $message = null): string
+    public function getOrderStatus(string $client_order_id, string $symbol, string $message = null): string
     {
         $event = "command";
-        $action = "order_status";
+        $action = "get_orders";
 
-        $data = '{"id":"' . $id . '","symbol":"' . $symbol . '"}';
+        $data = '[{"client_order_id":"' . $client_order_id . '","symbol":"' . $symbol . '"}]';
+
+        return $this->messageGenerator($event, $action, $data, $message);
+    }
+
+    /**
+     * Запрос статуса нескольких ордеров
+     * Структура массива ордеров: [["client_order_id1", "symbol1"], ["client_order_id2", "symbol2"], ...]
+     *
+     * @param array $orders Массив ордеров
+     * @param string|null $message Сообщение (необязательно)
+     * @return string
+     */
+    public function getOrderStatuses(array $orders, string $message = null): string
+    {
+
+        $event = "command";
+        $action = "get_orders";
+
+        $data = '[';
+
+        foreach ($orders as $order) {
+            $data .= '{"client_order_id":"' . $order['client_order_id'] . '","symbol":"' . $order['symbol'] . '"},';
+        }
+
+        $data = rtrim($data, ',') . ']';
 
         return $this->messageGenerator($event, $action, $data, $message);
     }
@@ -224,98 +261,24 @@ class Api
      * @param array|null $assets Массив активов ["BTC", "ETH", ...]
      * @param string|null $message Сообщение (необязательно)
      * @return string
+     * @throws \Exception
      */
     public function getBalances(array $assets = null, string $message = null): string
     {
         $event = "command";
-        $action = "get_balances";
+        $action = "get_balance";
 
         if (is_array($assets) && count($assets) > 0) {
-            $data = '{"assets":[';
+            $data = '[';
 
             foreach ($assets as $asset) {
                 $data .= '"' . $asset . '",';
             }
 
-            $data = rtrim($data, ',') . ']}';
+            $data = rtrim($data, ',') . ']';
         } else {
-            $data = '""';
+            $data = '[]';
         }
-
-        return $this->messageGenerator($event, $action, $data, $message);
-    }
-
-    /**
-     * Информация о создании, закрытие, статусе ордера
-     *
-     * @param string $action Действие (order_created, order_closed или order_status)
-     * @param string $id ID ордера
-     * @param int $timestamp Таймстамп создания/закрытия или статуса
-     * @param string $status Текущий статус (open, closed или canceled)
-     * @param string $symbol Торговая пара
-     * @param string $type Тип (limit или market)
-     * @param string $side Направление сделки
-     * @param float $amount Количество
-     * @param float $price Цена
-     * @param float $filled Текущая заполненность
-     * @param string|null $message Сообщение (необязательно)
-     * @return string
-     */
-    public function orderInfo(string $action, string $id, int $timestamp, string $status, string $symbol, string $type, string $side, float $amount, float $price, float $filled, string $message = null): string
-    {
-        $event = "data";
-
-        $data = '{"id":"' . $id . '",' .
-            '"timestamp":"' . $timestamp . '",' .
-            '"status":"' . $status . '",' .
-            '"symbol":"' . $symbol . '",' .
-            '"type":"' . $type . '",' .
-            '"side":"' . $side . '",' .
-            '"amount":' . $amount . ',' .
-            '"price":' . $price . ',' .
-            '"filled":' . $filled . '}';
-
-        return $this->messageGenerator($event, $action, $data, $message);
-    }
-
-    /**
-     * Информация о балансах (от гейта к ядру).
-     * Структура массива балансов: ["BTC" => ["free" => 0.0123, "used" => 0, "total" => 0.0123], ...]
-     *
-     * @param array $balances Массив балансов
-     * @param string|null $message Сообщение (необязательно)
-     * @return string
-     */
-    public function balances(array $balances, string $message = null): string
-    {
-        $event = "data";
-        $action = "balances";
-
-        $data = json_encode($balances);
-
-        return $this->messageGenerator($event, $action, $data, $message);
-    }
-
-    /**
-     * Ордербук отправляемый гейтом ядру.
-     * Структура массива ордербука:
-     * ["bids" => [[price, amount], ...],"asks" => [[price, amount], ...]]
-     *
-     * @param array $orderbook Массив ордербука
-     * @param string $symbol Торговая пара
-     * @param int|null $timestamp Таймстамп получения
-     * @param string|null $message Сообщение (необязательно)
-     * @return string
-     */
-    public function orderbook(array $orderbook, string $symbol, int $timestamp = null, string $message = null): string
-    {
-        $event = "data";
-        $action = "orderbook";
-
-        $orderbook["symbol"] = $symbol;
-        $orderbook["timestamp"] = $timestamp;
-
-        $data = json_encode($orderbook);
 
         return $this->messageGenerator($event, $action, $data, $message);
     }
@@ -327,12 +290,31 @@ class Api
      * @param mixed $data Данные об ошибке
      * @param string|null $message Сообщение об ошибке
      * @return string
+     * @throws \Exception
      */
     public function error(string $action, $data = "", string $message = null): string
     {
         $event = "error";
 
         $data = json_encode($data);
+
+        return $this->messageGenerator($event, $action, $data, $message);
+    }
+
+    /**
+     * Главная метрика компонента
+     *
+     * @param int $metric Инкриминируемая метрика компонента
+     * @param string|null $message Сообщение об ошибке
+     * @return string
+     * @throws \Exception
+     */
+    public function ping(int $metric, string $message = null): string
+    {
+        $event = "data";
+        $action = "ping";
+
+        $data = $metric;
 
         return $this->messageGenerator($event, $action, $data, $message);
     }
