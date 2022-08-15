@@ -1,0 +1,14 @@
+{
+  "name": "RoboTradeCode/PHP-API",
+  "description": "PHP wrapper for RoboTrade API",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "idv",
+      "email": "idv@idv.su"
+    }
+  ],
+  "require": {
+  }
+}
