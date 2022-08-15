@@ -1,4 +1,5 @@
 {
+  "version": "2.0.0",
   "name": "RoboTradeCode/PHP-API",
   "description": "PHP wrapper for RoboTrade API",
   "minimum-stability": "dev",
